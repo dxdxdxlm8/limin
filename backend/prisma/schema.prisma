@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HomeConfig {
+  id              Int      @id @default(autoincrement())
+  heroSlides      String?
+  philosophyTitle String?
+  yearsExperience Int?
+  globalBrands    Int?
+  servedCustomers Int?
+  updatedAt       DateTime @updatedAt
+}
+
+model ContactConfig {
+  id            Int      @id @default(autoincrement())
+  address       String?
+  phone         String?
+  email         String?
+  workingHours  String?
+  updatedAt     DateTime @updatedAt
+  addressEn     String?
+  companyName   String?
+  companyNameEn String?
+  introText     String?
+  mapUrl        String?
+  wechat        String?
+  weibo         String?
+}
+
+model Brand {
+  id              Int       @id @default(autoincrement())
+  name            String
+  nameEn          String?
+  country         String?
+  description     String?
+  longDescription String?
+  story           String?
+  logo            String?
+  displayOrder    Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  brandImage      String?
+  products        Product[]
+}
+
+model Category {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String?
+  displayOrder Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  products     Product[]
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  summary     String?
+  description String?
+  imageUrl    String?
+  categoryId  Int?
+  brandId     Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  images      String?
+  brand       Brand?    @relation(fields: [brandId], references: [id])
+  category    Category? @relation(fields: [categoryId], references: [id])
+}
+
+model News {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  imageUrl    String?
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  slug        String?
+  summary     String?
+}
+
+model SiteConfig {
+  id          Int      @id @default(autoincrement())
+  logoUrl     String?
+  accentColor String?  @default("#C9A96E")
+  updatedAt   DateTime @updatedAt
+}

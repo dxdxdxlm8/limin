@@ -70,7 +70,7 @@ export function Header() {
     >
       <div className="max-w-[1920px] mx-auto px-8">
         <div className="flex items-center py-4">
-          <Link to="/" className="flex items-center gap-4 group mr-16">
+          <Link to="/" className="flex items-center gap-4 group mr-4">
             {siteConfig?.logoUrl ? (
               <img
                 src={siteConfig.logoUrl}
@@ -84,7 +84,7 @@ export function Header() {
             )}
           </Link>
 
-          <nav ref={navRef} className="hidden lg:flex items-center gap-8 relative">
+          <nav ref={navRef} className="hidden lg:flex items-center gap-8 relative ml-12">
             <Link
               to="/"
               onMouseEnter={() => setHoveredIndex(0)}

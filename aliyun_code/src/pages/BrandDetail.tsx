@@ -103,7 +103,7 @@ export default function BrandDetail() {
                     {brand.name}
                   </h1>
                   <div className="w-16 h-px mb-8" style={{ background: `linear-gradient(to right, ${c.accent}66, transparent)` }} />
-                  <p className="font-light max-w-lg tracking-[0.05em] text-base leading-relaxed" style={{ color: c.textMuted }}>
+                  <p className="font-light max-w-lg tracking-[0.05em] text-base leading-relaxed" style={{ color: c.text }}>
                     {brand.description}
                   </p>
                 </div>

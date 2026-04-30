@@ -84,12 +84,12 @@ export function Header() {
             )}
           </Link>
 
-          <nav ref={navRef} className="hidden lg:flex items-center gap-8 relative ml-48">
+          <nav ref={navRef} className="hidden lg:flex items-center gap-12 relative ml-56">
             <Link
               to="/"
               onMouseEnter={() => setHoveredIndex(0)}
               onMouseLeave={() => setHoveredIndex(null)}
-              className={`nav-item text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4 ${getTextColor(0, '/')}`}
+              className={`nav-item text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4 px-2 ${getTextColor(0, '/')}`}
               style={{ color: hoveredIndex === 0 ? accentColor : undefined }}
             >
               首页
@@ -100,7 +100,7 @@ export function Header() {
                 <button
                   onMouseEnter={() => setHoveredIndex(1)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  className={`nav-item flex items-center gap-2 text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4`}
+                  className={`nav-item flex items-center gap-1 text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4 px-2`}
                   style={{ color: hoveredIndex === 1 ? accentColor : (isLight ? 'rgb(75 85 99)' : 'rgb(209 213 219)') }}
                 >
                   品牌 <FaChevronDown size={8} className="opacity-50" />
@@ -114,7 +114,7 @@ export function Header() {
                 <button
                   onMouseEnter={() => setHoveredIndex(2)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  className={`nav-item flex items-center gap-2 text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4`}
+                  className={`nav-item flex items-center gap-1 text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4 px-2`}
                   style={{ color: hoveredIndex === 2 ? accentColor : (isLight ? 'rgb(75 85 99)' : 'rgb(209 213 219)') }}
                 >
                   产品 <FaChevronDown size={8} className="opacity-50" />
@@ -127,7 +127,7 @@ export function Header() {
               to="/news"
               onMouseEnter={() => setHoveredIndex(3)}
               onMouseLeave={() => setHoveredIndex(null)}
-              className={`nav-item text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4 ${getTextColor(3, '/news')}`}
+              className={`nav-item text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4 px-2 ${getTextColor(3, '/news')}`}
               style={{ color: hoveredIndex === 3 ? accentColor : undefined }}
             >
               新闻
@@ -137,7 +137,7 @@ export function Header() {
               to="/contact"
               onMouseEnter={() => setHoveredIndex(4)}
               onMouseLeave={() => setHoveredIndex(null)}
-              className={`nav-item text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4 ${getTextColor(4, '/contact')}`}
+              className={`nav-item text-base font-normal tracking-[0.2em] uppercase transition-all duration-300 py-4 px-2 ${getTextColor(4, '/contact')}`}
               style={{ color: hoveredIndex === 4 ? accentColor : undefined }}
             >
               联系

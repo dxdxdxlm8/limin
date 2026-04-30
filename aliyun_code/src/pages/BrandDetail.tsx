@@ -103,7 +103,7 @@ export default function BrandDetail() {
                     {brand.name}
                   </h1>
                   <div className="w-16 h-px mb-8" style={{ background: `linear-gradient(to right, ${c.accent}66, transparent)` }} />
-                  <p className="font-light max-w-lg tracking-[0.05em] text-base leading-relaxed" style={{ color: c.textSub }}>
+                  <p className="font-light max-w-lg tracking-[0.05em] text-base leading-relaxed" style={{ color: c.textMuted }}>
                     {brand.description}
                   </p>
                 </div>
@@ -125,7 +125,7 @@ export default function BrandDetail() {
             <ScrollAnimation delay={100}>
               <div
                 className={`prose prose-lg max-w-none font-light leading-[1.9] tracking-[0.02em] ${isLight ? '' : 'prose-invert'}`}
-                style={{ color: c.textSub }}
+                style={{ color: c.text }}
                 dangerouslySetInnerHTML={{ __html: brand.long_description || '' }}
               />
             </ScrollAnimation>

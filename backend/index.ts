@@ -480,15 +480,34 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 // Serve frontend static files (for production deployment)
-const frontendDistPath = path.join(__dirname, '../../aliyun_code/dist');
-if (fs.existsSync(frontendDistPath)) {
-  app.use(express.static(frontendDistPath));
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
-      res.sendFile(path.join(frontendDistPath, 'index.html'));
-    }
-  });
+const possiblePaths = [
+  path.join(__dirname, '../../aliyun_code/dist'),  // 本地开发
+  path.join(__dirname, '../aliyun_code/dist'),     // Render 可能的路径
+  path.join(process.cwd(), '../aliyun_code/dist'), // 另一种可能
+  path.join(process.cwd(), 'aliyun_code/dist'),    // Render 根目录
+];
+
+let frontendDistPath = null;
+for (const p of possiblePaths) {
+  if (fs.existsSync(p)) {
+    frontendDistPath = p;
+    break;
+  }
+}
+
+if (frontendDistPath) {
   console.log('Frontend static files served from:', frontendDistPath);
+  app.use(express.static(frontendDistPath));
+  
+  // SPA fallback - 所有非 API 路由都返回 index.html
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+} else {
+  console.log('Frontend dist not found in any of:', possiblePaths);
 }
 
 app.listen(PORT, () => {

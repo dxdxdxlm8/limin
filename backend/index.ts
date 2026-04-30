@@ -10,7 +10,11 @@ import fs from 'fs';
 const prisma = new PrismaClient();
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('FATAL ERROR: JWT_SECRET environment variable is not set');
+  process.exit(1);
+}
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -83,10 +87,51 @@ app.post('/api/login', async (req, res) => {
   if (!user) return res.status(400).json({ error: 'User not found' });
   
   const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) return res.status(400).json({ error: 'Invalid password' });
-  
+  if (!validPassword) return res.status(401).json({ error: 'Invalid password' });
+
   const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1d' });
   res.json({ token, username: user.username });
+});
+
+// Change Password Route
+app.post('/api/change-password', authenticateToken, async (req, res) => {
+  try {
+    const { username, currentPassword, newPassword } = req.body;
+
+    if (!username || !currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters' });
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({ where: { username } });
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    // Verify current password
+    const validPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!validPassword) {
+      return res.status(400).json({ error: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update password
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword }
+    });
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (err: any) {
+    console.error('Change password error:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Image upload route
@@ -413,6 +458,25 @@ app.put('/api/siteConfig/:id', authenticateToken, async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// Global error handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Error:', err);
+  
+  // Handle multer file size error
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: '文件大小超过限制（最大50MB）' });
+  }
+  
+  // Handle multer file type error
+  if (err.message === '只允许上传图片文件') {
+    return res.status(415).json({ error: err.message });
+  }
+  
+  res.status(err.status || 500).json({ 
+    error: err.message || 'Internal server error' 
+  });
 });
 
 app.listen(PORT, () => {

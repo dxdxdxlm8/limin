@@ -5,10 +5,44 @@ import { Footer } from '@/components/generated/Footer';
 import { ScrollAnimation } from '@/components/generated/ScrollAnimation';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 import { getContactInfo, type ContactInfo } from '@/lib/queries';
+import { useThemeContext } from '@/lib/themeContext';
+
+function ContactCard({ icon: Icon, label, children, c }: {
+  icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>;
+  label: string;
+  children: React.ReactNode;
+  c: any;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      className="text-center p-12 transition-all duration-700"
+      style={{
+        backgroundColor: c.bgCard,
+        border: `1px solid ${hovered ? c.borderHover : c.border}`,
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div
+        className="w-16 h-16 mx-auto mb-8 rounded-full flex items-center justify-center transition-colors duration-700"
+        style={{ border: `1px solid ${hovered ? c.borderAccent : c.border}` }}
+      >
+        <Icon size={18} className="transition-colors duration-700" style={{ color: hovered ? c.accent : c.textSub }} />
+      </div>
+      <h3 className="text-[10px] font-normal tracking-[0.4em] uppercase mb-4" style={{ color: c.textSub }}>
+        {label}
+      </h3>
+      {children}
+    </div>
+  );
+}
 
 export default function Contact() {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isLight, colors: c } = useThemeContext();
 
   useEffect(() => {
     async function fetchData() {
@@ -24,14 +58,15 @@ export default function Contact() {
       <>
         <PageMeta title="联系我们 - LIMIN AUDIO 立敏音响" />
         <Header />
-        <main className="pt-20 min-h-screen bg-black flex items-center justify-center">
+        <main className="pt-20 min-h-screen flex items-center justify-center" style={{ backgroundColor: c.bg }}>
           <div className="text-center">
-            <p className="text-sm font-light text-gray-400 tracking-[0.2em]">加载中...</p>
+            <div className="w-8 h-8 rounded-full animate-spin mx-auto mb-6" style={{ border: `1px solid ${c.accent}4D`, borderTopColor: c.accent }} />
+            <p className="text-sm font-light tracking-[0.3em] uppercase" style={{ color: c.textMuted }}>Loading</p>
           </div>
         </main>
         <Footer />
-      </>);
-
+      </>
+    );
   }
 
   return (
@@ -39,119 +74,120 @@ export default function Contact() {
       <PageMeta
         title="联系我们 - LIMIN AUDIO 立敏音响"
         description="联系 LIMIN AUDIO 立敏音响，获取专业音响咨询服务和产品介绍"
-        keywords={['联系我们', '音响咨询', '预约试听', 'LIMIN AUDIO']} />
+        keywords={['联系我们', '音响咨询', '预约试听', 'LIMIN AUDIO']}
+      />
 
       <Header />
       <main className="pt-20">
-        <section className="py-24 bg-[#0A0A0A]">
-          <div className="max-w-[1920px] mx-auto px-8 text-center">
+        <section className="relative py-12 overflow-hidden" style={{ backgroundColor: c.bg }}>
+          <div className="relative z-10 max-w-[1400px] mx-auto px-8 text-center">
             <ScrollAnimation>
-              <p className="text-xs font-light tracking-[0.3em] uppercase text-gray-500 mb-4">CONTACT US</p>
-              <h1 className="text-4xl md:text-6xl font-extralight text-white mb-6">
+              <p className="text-[10px] font-normal tracking-[0.4em] uppercase mb-4" style={{ color: `${c.accent}99` }}>
+                Contact Us
+              </p>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-[0.1em] mb-4" style={{ color: c.text }}>
                 联系我们
               </h1>
-              <div className="w-12 h-px bg-white/20 mx-auto" />
+              <div className="w-16 h-px mx-auto mb-4" style={{ background: `linear-gradient(to right, transparent, ${c.accent}66, transparent)` }} />
+              <p className="font-light max-w-xl mx-auto tracking-[0.05em] text-base leading-relaxed" style={{ color: c.textMuted }}>
+                我们期待与您交流，为您提供专业的音响咨询服务
+              </p>
             </ScrollAnimation>
           </div>
         </section>
 
-        <section className="py-20 bg-black">
-          <div className="max-w-[1920px] mx-auto px-8">
+        <section className="py-16" style={{ backgroundColor: c.bg }}>
+          <div className="max-w-[800px] mx-auto px-8">
             <ScrollAnimation>
-              <div className="max-w-4xl mx-auto">
-                {contactInfo?.intro_text ? (
-                  <div
-                    className="text-sm font-light text-gray-400 leading-relaxed tracking-[0.05em] prose prose-invert max-w-none"
-                    dangerouslySetInnerHTML={{ __html: contactInfo.intro_text }}
-                  />
-                ) : (
-                  <div className="space-y-8 text-sm font-light text-gray-400 leading-relaxed tracking-[0.05em]">
-                    <p className="text-base">
-                      我们在中国领导高端音频业务超过 25 年，提供来自各大洲的最佳设备，提供最先进的 Hi-End 音频体验，与客户分享对音乐艺术的热情。
-                    </p>
-                    <p className="text-base">
-                      我们追求最好的音频性能。我们选择和分销世界级品牌和组件，采用新技术和制作定制服务，以确保我们的客户能够在他们的聆听环境中体验高保真音乐再现。
-                    </p>
-                    <p className="text-base">
-                      我们在上海设有工作室和展示厅，在中国各地设有经销商。
-                    </p>
-                    <p className="text-base">
-                      我们所有的产品都经过精心挑选，代表了我们制造商的性能和支持的巅峰。
-                    </p>
-                    <p className="text-base">
-                      无论您是在寻找音响系统还是家庭影院，一体化系统或模拟转盘，我们随时为您提供帮助。我们的目标是引导您，让您轻松选择音乐系统，无论您的预算如何。
-                    </p>
-                    <p className="text-white text-base">
-                      如果您有任何疑问，请联系我们。
-                    </p>
-                  </div>
-                )}
+              <div className="flex items-center gap-6 mb-10">
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${c.border})` }} />
+                <p className="text-[10px] font-normal tracking-[0.4em] uppercase" style={{ color: `${c.accent}99` }}>About Us</p>
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${c.border})` }} />
               </div>
             </ScrollAnimation>
+
+            <ScrollAnimation delay={100}>
+              {contactInfo?.intro_text ? (
+                <div
+                  className={`text-sm font-light leading-[1.9] tracking-[0.02em] prose max-w-none ${isLight ? '' : 'prose-invert'}`}
+                  style={{ color: c.textMuted }}
+                  dangerouslySetInnerHTML={{ __html: contactInfo.intro_text }}
+                />
+              ) : (
+                <div className="space-y-6 text-sm font-light leading-[1.9] tracking-[0.02em]" style={{ color: c.textMuted }}>
+                  <p>
+                    我们在中国领导高端音频业务超过 25 年，提供来自各大洲的最佳设备，提供最先进的 Hi-End 音频体验，与客户分享对音乐艺术的热情。
+                  </p>
+                  <p>
+                    我们追求最好的音频性能。我们选择和分销世界级品牌和组件，采用新技术和制作定制服务，以确保我们的客户能够在他们的聆听环境中体验高保真音乐再现。
+                  </p>
+                  <p>
+                    我们在上海设有工作室和展示厅，在中国各地设有经销商。
+                  </p>
+                  <p>
+                    无论您是在寻找音响系统还是家庭影院，一体化系统或模拟转盘，我们随时为您提供帮助。我们的目标是引导您，让您轻松选择音乐系统，无论您的预算如何。
+                  </p>
+                </div>
+              )}
+            </ScrollAnimation>
           </div>
         </section>
 
-        <section className="py-24 bg-[#F5F3EF]">
-          <div className="max-w-[1920px] mx-auto px-8">
+        <section className="py-16" style={{ backgroundColor: c.bgAlt }}>
+          <div className="max-w-[1400px] mx-auto px-8">
             <ScrollAnimation>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                <div className="text-center p-10 bg-black hover:bg-white/[0.02] transition-all duration-700">
-                  <div className="w-16 h-16 mx-auto mb-6 border border-white/20 rounded-full flex items-center justify-center">
-                    <FaPhone className="text-white" size={20} />
-                  </div>
-                  <h3 className="font-light tracking-[0.2em] uppercase text-white mb-4 text-base">
-                    电话咨询
-                  </h3>
-                  <p className="text-lg font-extralight text-white mb-2">
+              <div className="flex items-center gap-6 mb-10">
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${c.border})` }} />
+                <p className="text-[10px] font-normal tracking-[0.4em] uppercase" style={{ color: `${c.accent}99` }}>Get In Touch</p>
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${c.border})` }} />
+              </div>
+            </ScrollAnimation>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <ScrollAnimation delay={0}>
+                <ContactCard icon={FaPhone} label="电话咨询" c={c}>
+                  <p className="text-lg font-extralight tracking-[0.05em]" style={{ color: c.text }}>
                     {contactInfo?.phone || '0086-21-56317880'}
                   </p>
-                </div>
+                </ContactCard>
+              </ScrollAnimation>
 
-                <div className="text-center p-10 bg-black hover:bg-white/[0.02] transition-all duration-700">
-                  <div className="w-16 h-16 mx-auto mb-6 border border-white/20 rounded-full flex items-center justify-center">
-                    <FaEnvelope className="text-white" size={20} />
-                  </div>
-                  <h3 className="font-light tracking-[0.2em] uppercase text-white mb-4 text-base">
-                    邮箱联系
-                  </h3>
-                  <p className="text-lg font-extralight text-white">
+              <ScrollAnimation delay={100}>
+                <ContactCard icon={FaEnvelope} label="邮箱联系" c={c}>
+                  <p className="text-lg font-extralight tracking-[0.05em]" style={{ color: c.text }}>
                     {contactInfo?.email || 'info@liminaudio.com'}
                   </p>
-                </div>
+                </ContactCard>
+              </ScrollAnimation>
 
-                <div className="text-center p-10 bg-black hover:bg-white/[0.02] transition-all duration-700">
-                  <div className="w-16 h-16 mx-auto mb-6 border border-white/20 rounded-full flex items-center justify-center">
-                    <FaMapMarkerAlt className="text-white" size={20} />
-                  </div>
-                  <h3 className="font-light tracking-[0.2em] uppercase text-white mb-4 text-base">
-                    地址
-                  </h3>
-                  <p className="text-sm font-light text-gray-400">
+              <ScrollAnimation delay={200}>
+                <ContactCard icon={FaMapMarkerAlt} label="地址" c={c}>
+                  <p className="text-sm font-light leading-relaxed" style={{ color: c.textMuted }}>
                     {contactInfo?.address || '上海市黄浦区南苏州路 933 号 103 室'}
                   </p>
-                </div>
-              </div>
-            </ScrollAnimation>
+                </ContactCard>
+              </ScrollAnimation>
+            </div>
           </div>
         </section>
 
-        {contactInfo?.map_url &&
-        <section className="py-20 bg-black">
-            <div className="max-w-[1920px] mx-auto px-8">
+        {contactInfo?.map_url && (
+          <section className="py-16" style={{ backgroundColor: c.bg }}>
+            <div className="max-w-[1400px] mx-auto px-8">
               <ScrollAnimation>
-                <div className="aspect-[21/9] bg-white/5">
+                <div className="aspect-[21/9] overflow-hidden" style={{ backgroundColor: c.bgAlt }}>
                   <img
-                  src={contactInfo.map_url}
-                  alt="工作室位置"
-                  className="w-full h-full object-cover" />
-
+                    src={contactInfo.map_url}
+                    alt="工作室位置"
+                    className="w-full h-full object-cover opacity-80"
+                  />
                 </div>
               </ScrollAnimation>
             </div>
           </section>
-        }
+        )}
       </main>
       <Footer />
-    </>);
-
+    </>
+  );
 }

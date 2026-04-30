@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { PageTransition } from "@/components/generated/PageTransition";
+import { ThemeProvider } from "@/lib/themeContext";
 
 export function Layout() {
   const { pathname } = useLocation();
@@ -13,12 +14,14 @@ export function Layout() {
   }, [pathname]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main className="flex-1">
-        <PageTransition>
-          <Outlet />
-        </PageTransition>
-      </main>
-    </div>
+    <ThemeProvider>
+      <div className="flex flex-col min-h-screen">
+        <main className="flex-1">
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
+        </main>
+      </div>
+    </ThemeProvider>
   );
 }

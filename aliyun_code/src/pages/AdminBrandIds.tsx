@@ -14,7 +14,7 @@ export default function AdminBrandIds() {
     fetchData();
   }, []);
 
-  const handleCopy = (id: string, brandName: string) => {
+  const handleCopy = (id: string, _brandName: string) => {
     navigator.clipboard.writeText(id);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);

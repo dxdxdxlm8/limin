@@ -3,17 +3,17 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const slides = [
   {
-    image: 'https://baas-api.wanwang.xin/toc/image/preview/luxury-hifi-audio-showroom-dark.jpg?w=1920&h=1080&q=90',
+    image: '/placeholder.svg',
     title: '通往最好的声音和音乐',
     subtitle: '25 年专注高端音频，连接全球顶级音响品牌与中国发烧友',
   },
   {
-    image: 'https://baas-api.wanwang.xin/toc/image/preview/premium-audio-equipment-display.jpg?w=1920&h=1080&q=90',
+    image: '/placeholder.svg',
     title: '全球顶级音响品牌',
     subtitle: '代理 Ayon Audio、BAT、Benchmark、Ryan、Lyravox、MSB 等国际知名品牌',
   },
   {
-    image: 'https://baas-api.wanwang.xin/toc/image/preview/high-end-speaker-system.jpg?w=1920&h=1080&q=90',
+    image: '/placeholder.svg',
     title: '专业音响咨询服务',
     subtitle: '资深音响专家团队，为您提供系统咨询和选型建议',
   },

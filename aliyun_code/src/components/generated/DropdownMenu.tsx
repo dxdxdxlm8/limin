@@ -30,7 +30,7 @@ export function DropdownMenu({ trigger, items, className = '' }: DropdownMenuPro
               <Link
                 key={item.path}
                 to={item.path}
-                className="block px-6 py-3 text-xs text-gray-400 hover:text-white transition-all duration-300 tracking-[0.15em] relative overflow-hidden group hover:bg-white/5"
+                className="block px-6 py-3 text-sm font-medium text-gray-400 hover:text-white transition-all duration-300 tracking-[0.15em] relative overflow-hidden group hover:bg-white/5"
                 onClick={() => setIsOpen(false)}
               >
                 <span className="relative z-10">{item.label}</span>

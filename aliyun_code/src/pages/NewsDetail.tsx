@@ -5,11 +5,13 @@ import { Footer } from '@/components/generated/Footer';
 import { useParams, Link } from 'react-router-dom';
 import { ScrollAnimation } from '@/components/generated/ScrollAnimation';
 import { getPostBySlug, type Post } from '@/lib/queries';
+import { useThemeContext } from '@/lib/themeContext';
 
 export default function NewsDetail() {
   const { id } = useParams<{ id: string }>();
   const [article, setArticle] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isLight, colors: c } = useThemeContext();
 
   useEffect(() => {
     async function fetchData() {
@@ -29,9 +31,10 @@ export default function NewsDetail() {
       <>
         <PageMeta title="新闻详情 - LIMIN AUDIO 立敏音响" />
         <Header />
-        <main className="pt-20 min-h-screen bg-black flex items-center justify-center">
+        <main className="pt-20 min-h-screen flex items-center justify-center" style={{ backgroundColor: c.bg }}>
           <div className="text-center">
-            <p className="text-sm font-light text-gray-400 tracking-[0.2em]">加载中...</p>
+            <div className="w-8 h-8 rounded-full animate-spin mx-auto mb-6" style={{ border: `1px solid ${c.accent}4D`, borderTopColor: c.accent }} />
+            <p className="text-sm font-light tracking-[0.3em] uppercase" style={{ color: c.textMuted }}>Loading</p>
           </div>
         </main>
         <Footer />
@@ -44,12 +47,16 @@ export default function NewsDetail() {
       <>
         <PageMeta title="新闻未找到 - LIMIN AUDIO 立敏音响" description="抱歉，您访问的新闻不存在" />
         <Header />
-        <main className="pt-20 min-h-screen bg-black flex items-center justify-center">
+        <main className="pt-20 min-h-screen flex items-center justify-center" style={{ backgroundColor: c.bg }}>
           <div className="text-center">
             <ScrollAnimation>
-              <h1 className="text-3xl font-extralight text-white mb-4 tracking-[0.15em]">新闻未找到</h1>
-              <p className="text-sm font-light text-gray-400 mb-8">抱歉，您访问的新闻不存在或已下架</p>
-              <Link to="/news" className="inline-block px-8 py-3 bg-white hover:bg-gray-100 text-[#1A1A1A] text-xs font-light tracking-[0.2em] uppercase transition-all duration-500">
+              <h1 className="text-3xl font-extralight mb-4 tracking-[0.15em]" style={{ color: c.text }}>新闻未找到</h1>
+              <p className="text-sm font-light mb-8" style={{ color: c.textMuted }}>抱歉，您访问的新闻不存在或已下架</p>
+              <Link to="/news" className="inline-block px-10 py-3 text-[10px] font-normal tracking-[0.3em] uppercase transition-all duration-700"
+                style={{ border: `1px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'}`, color: c.text }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = `${c.accent}4D`; e.currentTarget.style.color = c.accent; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = c.text; }}
+              >
                 返回新闻中心
               </Link>
             </ScrollAnimation>
@@ -69,25 +76,29 @@ export default function NewsDetail() {
       />
       <Header />
       <main className="pt-20">
-        <article className="py-20 bg-black">
+        <article className="py-16" style={{ backgroundColor: c.bg }}>
           <div className="max-w-4xl mx-auto px-8">
             <ScrollAnimation>
-              <div className="flex items-center gap-6 mb-8">
+              <div className="text-center mb-10">
                 {article.published_at && (
-                  <span className="text-xs font-light text-gray-600 tracking-[0.1em]">
-                    {new Date(article.published_at).toLocaleDateString('zh-CN')}
-                  </span>
+                  <p className="text-[10px] font-normal tracking-[0.4em] uppercase mb-4" style={{ color: `${c.accent}99` }}>
+                    {new Date(article.published_at).toLocaleDateString('zh-CN', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
                 )}
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-extralight mb-6 leading-tight tracking-[0.05em]" style={{ color: c.text }}>
+                  {article.title}
+                </h1>
+                <div className="w-16 h-px mx-auto" style={{ background: `linear-gradient(to right, transparent, ${c.accent}66, transparent)` }} />
               </div>
-
-              <h1 className="text-4xl md:text-5xl font-extralight text-white mb-10 leading-tight tracking-[0.05em]">
-                {article.title}
-              </h1>
             </ScrollAnimation>
 
             {article.featured_image_url && (
               <ScrollAnimation delay={200}>
-                <div className="aspect-[21/9] overflow-hidden mb-12 bg-white/5">
+                <div className="aspect-[21/9] overflow-hidden mb-10" style={{ backgroundColor: c.bgAlt }}>
                   <img
                     src={article.featured_image_url}
                     alt={article.title}
@@ -99,16 +110,20 @@ export default function NewsDetail() {
 
             <ScrollAnimation delay={300}>
               <div
-                className="prose prose-invert prose-lg max-w-none text-sm font-light text-gray-400 leading-relaxed"
+                className={`prose prose-lg max-w-none text-sm font-light leading-[1.9] tracking-[0.02em] ${isLight ? '' : 'prose-invert'}`}
+                style={{ color: c.textSub }}
                 dangerouslySetInnerHTML={{ __html: article.content || '' }}
               />
             </ScrollAnimation>
 
             <ScrollAnimation delay={400}>
-              <div className="border-t border-white/5 mt-12 pt-8">
+              <div className="mt-16 pt-8" style={{ borderTop: `1px solid ${c.border}` }}>
                 <Link
                   to="/news"
-                  className="inline-flex items-center gap-3 text-xs font-light tracking-[0.2em] uppercase text-gray-400 hover:text-white transition-colors duration-300"
+                  className="inline-flex items-center gap-3 text-[10px] font-normal tracking-[0.3em] uppercase transition-colors duration-500"
+                  style={{ color: c.textSub }}
+                  onMouseOver={e => e.currentTarget.style.color = c.accent}
+                  onMouseOut={e => e.currentTarget.style.color = c.textSub}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 19l-7-7 7-7" />

@@ -98,5 +98,6 @@ model SiteConfig {
   id          Int      @id @default(autoincrement())
   logoUrl     String?
   accentColor String?  @default("#C9A96E")
+  theme       String?  @default("dark")
   updatedAt   DateTime @updatedAt
 }

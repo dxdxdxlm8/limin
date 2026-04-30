@@ -5,10 +5,13 @@ import { Footer } from '@/components/generated/Footer';
 import { Link } from 'react-router-dom';
 import { ScrollAnimation } from '@/components/generated/ScrollAnimation';
 import { getPosts, type Post } from '@/lib/queries';
+import { useThemeContext } from '@/lib/themeContext';
 
 export default function News() {
   const [news, setNews] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hoveredId, setHoveredId] = useState<string | number | null>(null);
+  const { colors: c } = useThemeContext();
 
   useEffect(() => {
     async function fetchData() {
@@ -24,14 +27,15 @@ export default function News() {
       <>
         <PageMeta title="新闻中心 - LIMIN AUDIO 立敏音响" />
         <Header />
-        <main className="pt-20 min-h-screen bg-black flex items-center justify-center">
+        <main className="pt-20 min-h-screen flex items-center justify-center" style={{ backgroundColor: c.bg }}>
           <div className="text-center">
-            <p className="text-sm font-light text-gray-400 tracking-[0.2em]">加载中...</p>
+            <div className="w-8 h-8 rounded-full animate-spin mx-auto mb-6" style={{ border: `1px solid ${c.accent}4D`, borderTopColor: c.accent }} />
+            <p className="text-sm font-light tracking-[0.3em] uppercase" style={{ color: c.textMuted }}>Loading</p>
           </div>
         </main>
         <Footer />
-      </>);
-
+      </>
+    );
   }
 
   return (
@@ -39,77 +43,104 @@ export default function News() {
       <PageMeta
         title="新闻中心 - LIMIN AUDIO 立敏音响"
         description="了解 LIMIN AUDIO 最新动态，包括品牌新闻、产品发布、展会活动和行业资讯"
-        keywords={['LIMIN AUDIO 新闻', '音响资讯', '新品发布', '展会活动']} />
+        keywords={['LIMIN AUDIO 新闻', '音响资讯', '新品发布', '展会活动']}
+      />
 
       <Header />
       <main className="pt-20">
-        <section className="py-24 bg-[#0A0A0A]">
-          <div className="max-w-[1920px] mx-auto px-8 text-center">
+        <section className="relative py-12 overflow-hidden" style={{ backgroundColor: c.bg }}>
+          <div className="relative z-10 max-w-[1400px] mx-auto px-8 text-center">
             <ScrollAnimation>
-              <p className="text-xs font-light tracking-[0.3em] uppercase text-gray-500 mb-4">LATEST NEWS</p>
-              <h1 className="text-4xl md:text-6xl font-extralight text-white mb-6">
+              <p className="text-[10px] font-normal tracking-[0.4em] uppercase mb-4" style={{ color: `${c.accent}99` }}>
+                Latest News
+              </p>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-[0.1em] mb-4" style={{ color: c.text }}>
                 新闻中心
               </h1>
-              <div className="w-12 h-px bg-white/20 mx-auto mb-6" />
-              <p className="font-light text-gray-400 max-w-2xl mx-auto tracking-[0.1em] text-base">
+              <div className="w-16 h-px mx-auto mb-4" style={{ background: `linear-gradient(to right, transparent, ${c.accent}66, transparent)` }} />
+              <p className="font-light max-w-xl mx-auto tracking-[0.05em] text-base leading-relaxed" style={{ color: c.textMuted }}>
                 了解 LIMIN AUDIO 最新动态、产品发布和行业资讯
               </p>
             </ScrollAnimation>
           </div>
         </section>
 
-        <section className="py-20 bg-black">
-          <div className="max-w-[1920px] mx-auto px-8">
-            <div className="space-y-px bg-white/5">
-              {news.length === 0 ?
+        <section className="py-16" style={{ backgroundColor: c.bg }}>
+          <div className="max-w-[1400px] mx-auto px-8">
+            {news.length === 0 ? (
               <div className="text-center py-20">
-                  <p className="text-sm font-light text-gray-500 tracking-[0.2em]">暂无新闻</p>
-                </div> :
-
-              news.map((item, index) =>
-              <ScrollAnimation key={item.id} delay={index * 50}>
-                    <article className="group bg-black hover:bg-white/[0.02] transition-all duration-700">
+                <p className="text-sm font-light tracking-[0.2em]" style={{ color: c.textSub }}>暂无新闻</p>
+              </div>
+            ) : (
+              <div className="space-y-12">
+                {news.map((item, index) => (
+                  <ScrollAnimation key={item.id} delay={index * 80}>
+                    <article
+                      className="group"
+                      onMouseOver={() => setHoveredId(item.id)}
+                      onMouseOut={() => setHoveredId(null)}
+                    >
                       <Link to={`/news/${item.slug || item.id}`} className="block">
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
-                          <div className="md:col-span-5 aspect-[16/10] md:aspect-auto overflow-hidden">
-                            <img
-                          src={item.featured_image_url || 'https://baas-api.wanwang.xin/toc/image/preview/news-default.jpg?w=800&h=500&q=90'}
-                          alt={item.title}
-                          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
-
+                        <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+                          <div className={`lg:col-span-6 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                            <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: c.bgAlt }}>
+                              <img
+                                src={item.featured_image_url || '/placeholder.svg'}
+                                alt={item.title}
+                                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
+                              />
+                              <div
+                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                                style={{ background: `linear-gradient(to top, ${c.bg}99, transparent, transparent)` }}
+                              />
+                            </div>
                           </div>
-                          <div className="md:col-span-7 p-8 md:p-12 flex flex-col justify-center">
-                            {item.published_at &&
-                        <div className="flex items-center gap-4 mb-4">
-                                <span className="text-xs font-light text-gray-600 tracking-[0.1em]">
-                                  {new Date(item.published_at).toLocaleDateString('zh-CN')}
-                                </span>
+
+                          <div className={`lg:col-span-6 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                            <div className="lg:px-8">
+                              {item.published_at && (
+                                <div className="flex items-center gap-4 mb-6">
+                                  <span className="text-[10px] font-normal tracking-[0.3em] uppercase" style={{ color: `${c.accent}99` }}>
+                                    {new Date(item.published_at).toLocaleDateString('zh-CN', {
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}
+                                  </span>
+                                  <div className="flex-1 h-px" style={{ backgroundColor: c.border }} />
+                                </div>
+                              )}
+                              <h2
+                                className="text-2xl md:text-3xl font-extralight mb-6 tracking-[0.05em] leading-tight transition-colors duration-500"
+                                style={{ color: hoveredId === item.id ? c.accent : c.text }}
+                              >
+                                {item.title}
+                              </h2>
+                              <p className="text-sm font-light leading-[1.8] mb-8 line-clamp-3" style={{ color: c.textMuted }}>
+                                {item.summary}
+                              </p>
+                              <div
+                                className="flex items-center text-[10px] font-normal tracking-[0.3em] uppercase transition-colors duration-500"
+                                style={{ color: hoveredId === item.id ? c.accent : c.textSub }}
+                              >
+                                <span>阅读全文</span>
+                                <svg className="w-3 h-3 ml-3 transform group-hover:translate-x-2 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5l7 7-7 7" />
+                                </svg>
                               </div>
-                        }
-                            <h2 className="text-2xl md:text-3xl font-extralight text-white mb-4 tracking-[0.05em] group-hover:text-gray-300 transition-colors duration-300">
-                              {item.title}
-                            </h2>
-                            <p className="text-sm font-light text-gray-400 leading-relaxed mb-6">
-                              {item.summary}
-                            </p>
-                            <div className="flex items-center text-xs font-light tracking-[0.2em] uppercase text-gray-400 group-hover:text-white transition-colors duration-300">
-                              <span>阅读更多</span>
-                              <svg className="w-3 h-3 ml-2 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5l7 7-7 7" />
-                              </svg>
                             </div>
                           </div>
                         </div>
                       </Link>
                     </article>
                   </ScrollAnimation>
-              )
-              }
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </main>
       <Footer />
-    </>);
-
+    </>
+  );
 }

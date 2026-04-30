@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { TextStyle, FontSize } from '@tiptap/extension-text-style';
+import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import { TextAlign } from '@tiptap/extension-text-align';
 import { Image } from '@tiptap/extension-image';
 import { Link } from '@tiptap/extension-link';
 
-const API_BASE_URL = 'http://localhost:3000';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 // ===== Types =====
 interface HeroSlide {
@@ -86,6 +87,7 @@ interface SiteConfig {
   id: number;
   logoUrl: string | null;
   accentColor: string | null;
+  theme: string | null;
 }
 
 type SidebarType = 'create' | 'edit' | null;
@@ -186,7 +188,6 @@ function RichTextEditor({ value, onChange }: { value: string; onChange: (value: 
     extensions: [
       StarterKit,
       TextStyle,
-      FontSize,
       Color,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Image,
@@ -237,31 +238,7 @@ function RichTextEditor({ value, onChange }: { value: string; onChange: (value: 
         <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title="删除线"><s>S</s></ToolbarButton>
         <Divider />
 
-        {/* Font Size */}
-        <select
-          onChange={(e) => {
-            const size = e.target.value;
-            if (size) {
-              editor.chain().focus().setFontSize(size).run();
-            } else {
-              editor.chain().focus().unsetFontSize().run();
-            }
-            e.target.value = '';
-          }}
-          className="bg-zinc-700 text-white text-sm rounded px-2 py-1 border-none outline-none cursor-pointer"
-          title="字体大小"
-        >
-          <option value="">字号</option>
-          <option value="12px">12px</option>
-          <option value="14px">14px</option>
-          <option value="16px">16px</option>
-          <option value="18px">18px</option>
-          <option value="20px">20px</option>
-          <option value="24px">24px</option>
-          <option value="28px">28px</option>
-          <option value="32px">32px</option>
-        </select>
-        <Divider />
+
 
         {/* Color */}
         <div className="flex items-center gap-1">
@@ -437,6 +414,16 @@ export default function Admin() {
   const [siteConfig, setSiteConfig] = useState<SiteConfig | null>(null);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
 
+  // Password change states
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
   const tabs = [
     { id: 'product', label: '产品管理' },
     { id: 'category', label: '分类管理' },
@@ -445,22 +432,113 @@ export default function Admin() {
     { id: 'contact', label: '联系我们' },
     { id: 'homeConfig', label: '首页配置' },
     { id: 'siteConfig', label: '站点配置' },
+    { id: 'security', label: '安全设置' },
   ];
 
   // ===== Auth =====
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch(`${API_BASE_URL}/api/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const result = await res.json();
-    if (result.token) {
-      localStorage.setItem('admin_token', result.token);
-      setToken(result.token);
-    } else {
-      alert('登录失败: ' + (result.error || '账号或密码错误'));
+
+    try {
+      // Call backend login API
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const result = await res.json();
+
+      if (result.token) {
+        localStorage.setItem('admin_token', result.token);
+        localStorage.setItem('admin_username', username);
+        setToken(result.token);
+      } else {
+        alert('登录失败: ' + (result.error || '账号或密码错误'));
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      alert('登录失败: 网络错误');
+    }
+  };
+
+  // ===== Password Change =====
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    // Validation
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      setPasswordError('请填写所有字段');
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError('新密码长度至少6位');
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('两次输入的新密码不一致');
+      return;
+    }
+
+    if (passwordForm.newPassword === passwordForm.currentPassword) {
+      setPasswordError('新密码不能与当前密码相同');
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      // Get current admin username from localStorage
+      const adminUsername = localStorage.getItem('admin_username');
+
+      if (!adminUsername) {
+        setPasswordError('会话已过期，请重新登录');
+        setIsChangingPassword(false);
+        return;
+      }
+
+      // Call backend API to change password
+      const res = await fetch(`${API_BASE_URL}/api/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+        },
+        body: JSON.stringify({
+          username: adminUsername,
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword
+        })
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setPasswordError(result.error || '密码修改失败');
+        setIsChangingPassword(false);
+        return;
+      }
+
+      setPasswordSuccess('密码修改成功！请使用新密码重新登录');
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+
+      // Sign out and redirect to login after 2 seconds
+      setTimeout(() => {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_username');
+        setToken(null);
+        setPasswordSuccess('');
+      }, 2000);
+
+    } catch (err) {
+      console.error('Password change error:', err);
+      setPasswordError('网络错误，请稍后重试');
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -685,8 +763,8 @@ export default function Admin() {
       <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white">
         <form onSubmit={handleLogin} className="p-8 bg-zinc-900 rounded-lg w-96 flex flex-col gap-4 shadow-xl">
           <h1 className="text-2xl font-bold mb-4 text-center">后台管理登录</h1>
-          <input className="bg-zinc-800 p-3 rounded border border-zinc-700" placeholder="账号 (admin)" value={username} onChange={e => setUsername(e.target.value)} />
-          <input className="bg-zinc-800 p-3 rounded border border-zinc-700" type="password" placeholder="密码 (admin123)" value={password} onChange={e => setPassword(e.target.value)} />
+          <input className="bg-zinc-800 p-3 rounded border border-zinc-700" placeholder="请输入账号" value={username} onChange={e => setUsername(e.target.value)} />
+          <input className="bg-zinc-800 p-3 rounded border border-zinc-700" type="password" placeholder="请输入密码" value={password} onChange={e => setPassword(e.target.value)} />
           <button className="bg-blue-600 p-3 rounded mt-4 hover:bg-blue-500 font-medium" type="submit">登录</button>
         </form>
       </div>
@@ -1267,6 +1345,22 @@ export default function Admin() {
             </div>
             <p className="text-xs text-zinc-500 mt-2">用于导航栏激活状态、分割线、hover 效果等</p>
           </FormField>
+
+          <FormField label="站点风格">
+            <div className="flex gap-4">
+              <div className="flex-1 p-4 rounded-lg border-2 border-blue-500 bg-blue-500/10">
+                <div className="w-full h-20 rounded-md bg-[#050505] border border-white/10 mb-3 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-8 h-1 bg-[#C9A96E]/60 rounded mb-1.5 mx-auto" />
+                    <div className="w-12 h-1 bg-white/20 rounded mb-1.5 mx-auto" />
+                    <div className="w-6 h-1 bg-white/10 rounded mx-auto" />
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-white">暗色系</p>
+                <p className="text-xs text-zinc-500 mt-1">深色背景，沉浸感强</p>
+              </div>
+            </div>
+          </FormField>
         </div>
       </div>
 
@@ -1277,7 +1371,7 @@ export default function Admin() {
             const res = await fetch(`${API_BASE_URL}/api/siteConfig/${siteConfig.id}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ logoUrl: siteConfig.logoUrl, accentColor: siteConfig.accentColor }),
+              body: JSON.stringify({ logoUrl: siteConfig.logoUrl, accentColor: siteConfig.accentColor, theme: 'dark' }),
             });
             if (res.ok) alert('站点配置保存成功');
             else alert('保存失败');
@@ -1286,6 +1380,132 @@ export default function Admin() {
         >
           保存站点配置
         </button>
+      </div>
+    </div>
+  );
+
+  // ===== Security Settings =====
+  const renderSecuritySettings = () => (
+    <div className="max-w-2xl">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold">安全设置</h2>
+          <p className="text-zinc-400 text-sm mt-1">修改管理员登录密码，提高账户安全性</p>
+        </div>
+      </div>
+
+      <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6 space-y-6">
+        <div className="flex items-center gap-3 mb-6 pb-6 border-b border-zinc-800">
+          <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
+            <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">修改密码</h3>
+            <p className="text-zinc-500 text-sm">建议定期更换密码，使用包含字母、数字的复杂密码</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleChangePassword} className="space-y-5">
+          {passwordError && (
+            <div className="p-4 bg-red-950/50 border border-red-800/50 rounded-lg flex items-center gap-3">
+              <svg className="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-red-300 text-sm">{passwordError}</p>
+            </div>
+          )}
+
+          {passwordSuccess && (
+            <div className="p-4 bg-green-950/50 border border-green-800/50 rounded-lg flex items-center gap-3">
+              <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-green-300 text-sm">{passwordSuccess}</p>
+            </div>
+          )}
+
+          <FormField label="当前密码" required>
+            <input
+              type="password"
+              value={passwordForm.currentPassword}
+              onChange={e => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+              placeholder="请输入当前密码"
+              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all"
+            />
+          </FormField>
+
+          <FormField label="新密码" required>
+            <input
+              type="password"
+              value={passwordForm.newPassword}
+              onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+              placeholder="请输入新密码（至少6位）"
+              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all"
+            />
+          </FormField>
+
+          <FormField label="确认新密码" required>
+            <input
+              type="password"
+              value={passwordForm.confirmPassword}
+              onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+              placeholder="请再次输入新密码"
+              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all"
+            />
+          </FormField>
+
+          <div className="pt-4">
+            <button
+              type="submit"
+              disabled={isChangingPassword}
+              className="bg-amber-600 hover:bg-amber-500 disabled:bg-zinc-700 disabled:cursor-not-allowed px-8 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+            >
+              {isChangingPassword ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  修改中...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  确认修改密码
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Security Tips */}
+      <div className="mt-8 bg-zinc-900/50 rounded-xl border border-zinc-800/50 p-6">
+        <h3 className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-2">
+          <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          安全建议
+        </h3>
+        <ul className="space-y-2 text-sm text-zinc-500">
+          <li className="flex items-start gap-2">
+            <span className="text-amber-500 mt-0.5">•</span>
+            密码长度至少 8 位，建议包含大小写字母、数字和特殊字符
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-amber-500 mt-0.5">•</span>
+            避免使用生日、手机号等容易被猜到的信息作为密码
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-amber-500 mt-0.5">•</span>
+            建议每 3 个月更换一次密码
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-amber-500 mt-0.5">•</span>
+            修改密码后，系统会自动退出登录，请使用新密码重新登录
+          </li>
+        </ul>
       </div>
     </div>
   );
@@ -1400,7 +1620,7 @@ export default function Admin() {
           </button>
         ))}
         <div className="mt-auto">
-          <button onClick={() => { localStorage.removeItem('admin_token'); setToken(null); }} className="w-full text-left px-4 py-3 text-red-400 hover:bg-red-950 rounded-lg transition-colors">退出登录</button>
+          <button onClick={() => { localStorage.removeItem('admin_token'); localStorage.removeItem('admin_username'); setToken(null); }} className="w-full text-left px-4 py-3 text-red-400 hover:bg-red-950 rounded-lg transition-colors">退出登录</button>
         </div>
       </div>
       
@@ -1413,6 +1633,7 @@ export default function Admin() {
         {activeTab === 'contact' && renderContactManagement()}
         {activeTab === 'homeConfig' && renderHomeConfig()}
         {activeTab === 'siteConfig' && renderSiteConfig()}
+        {activeTab === 'security' && renderSecuritySettings()}
       </div>
     </div>
   );

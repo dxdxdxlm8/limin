@@ -90,7 +90,7 @@
   }
 
   ::selection {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(201, 169, 110, 0.3);
     color: inherit;
   }
 }
@@ -100,23 +100,31 @@
 }
 
 @layer utilities {
+  /* ============================================
+     页面过渡动画
+     ============================================ */
   .page-transition-in {
-    animation: pageFadeIn 0.5s ease-out forwards;
+    animation: pageFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   @keyframes pageFadeIn {
     from {
       opacity: 0;
+      transform: translateY(20px);
     }
     to {
       opacity: 1;
+      transform: translateY(0);
     }
   }
 
+  /* ============================================
+     滚动触发动画
+     ============================================ */
   .scroll-animate {
     opacity: 0;
-    transform: translateY(80px);
-    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(60px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .scroll-animate.animate-in {
@@ -126,30 +134,40 @@
 
   .scroll-animate.fade-in {
     opacity: 0;
-    transition: opacity 1.5s ease-out;
+    transition: opacity 1.2s ease-out;
   }
 
   .scroll-animate.fade-in.animate-in {
     opacity: 1;
   }
 
+  /* ============================================
+     图片揭示动画
+     ============================================ */
   .image-reveal {
     clip-path: inset(0 100% 0 0);
-    transition: clip-path 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: clip-path 1.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .image-reveal.animate-in {
     clip-path: inset(0 0 0 0);
   }
 
+  /* ============================================
+     悬停提升效果
+     ============================================ */
   .hover-lift {
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .hover-lift:hover {
-    transform: translateY(-12px);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   }
 
+  /* ============================================
+     文字渐变效果
+     ============================================ */
   .text-gradient {
     background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
     -webkit-background-clip: text;
@@ -157,10 +175,20 @@
     background-clip: text;
   }
 
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #C9A96E 0%, #E8D5A3 50%, #C9A96E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ============================================
+     玻璃卡片效果
+     ============================================ */
   .glass-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.02);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .glass-card-hover {
@@ -168,7 +196,221 @@
   }
 
   .glass-card-hover:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(201, 169, 110, 0.15);
+  }
+
+  /* ============================================
+     金色光晕效果
+     ============================================ */
+  .glow-gold {
+    box-shadow: 0 0 40px rgba(201, 169, 110, 0.1);
+  }
+
+  .glow-gold-hover:hover {
+    box-shadow: 0 0 60px rgba(201, 169, 110, 0.15);
+  }
+
+  /* ============================================
+     文字光晕
+     ============================================ */
+  .text-glow {
+    text-shadow: 0 0 40px rgba(201, 169, 110, 0.3);
+  }
+
+  /* ============================================
+     边框渐变
+     ============================================ */
+  .border-gradient {
+    border-image: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.3), transparent) 1;
+  }
+
+  /* ============================================
+     慢速弹跳动画
+     ============================================ */
+  .animate-bounce-slow {
+    animation: bounceSlow 2s ease-in-out infinite;
+  }
+
+  @keyframes bounceSlow {
+    0%, 100% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translateY(10px);
+      opacity: 1;
+    }
+  }
+
+  /* ============================================
+     滑入动画
+     ============================================ */
+  .animate-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-in-left {
+    animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* ============================================
+     缩放进入动画
+     ============================================ */
+  .animate-scale-in {
+    animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* ============================================
+     脉冲光晕
+     ============================================ */
+  .animate-pulse-glow {
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(201, 169, 110, 0.1);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(201, 169, 110, 0.2);
+    }
+  }
+
+  /* ============================================
+     线条展开动画
+     ============================================ */
+  .animate-line-expand {
+    animation: lineExpand 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes lineExpand {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* ============================================
+     背景渐变流动
+     ============================================ */
+  .animate-gradient-shift {
+    animation: gradientShift 8s ease infinite;
+    background-size: 200% 200%;
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* ============================================
+     图片悬停缩放
+     ============================================ */
+  .img-hover-zoom {
+    overflow: hidden;
+  }
+
+  .img-hover-zoom img {
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .img-hover-zoom:hover img {
+    transform: scale(1.08);
+  }
+
+  /* ============================================
+     遮罩渐变
+     ============================================ */
+  .mask-gradient-b {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+
+  /* ============================================
+     分隔线样式
+     ============================================ */
+  .divider-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.4), transparent);
+  }
+
+  /* ============================================
+     标签样式
+     ============================================ */
+  .tag-gold {
+    @apply text-[10px] font-normal tracking-[0.3em] uppercase text-[#C9A96E]/60;
+  }
+
+  /* ============================================
+     页面背景
+     ============================================ */
+  .bg-hiend {
+    background-color: #050505;
+  }
+
+  .bg-hiend-light {
+    background-color: #080808;
+  }
+
+  .bg-hiend-lighter {
+    background-color: #0A0A0A;
   }
 }

@@ -1,6 +1,4 @@
-import { supabase } from './supabaseClient';
-
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 // 后端 API 返回的首页配置
 export interface HomeConfigFromAPI {
@@ -115,18 +113,37 @@ export async function getHomeConfigFromAPI(): Promise<ParsedHomeConfig | null> {
 }
 
 export async function getHomeSettings(): Promise<HomeSettings | null> {
-  const { data, error } = await supabase
-    .from('home_settings')
-    .select('*')
-    .eq('is_deleted', false)
-    .single();
-
-  if (error) {
-    console.error('Failed to fetch home settings:', error);
+  // 使用后端 API 替代 Supabase
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/homeConfig`);
+    if (!res.ok) {
+      console.error('Failed to fetch home settings from API');
+      return null;
+    }
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      return null;
+    }
+    // 转换为 HomeSettings 格式
+    const config = data[0];
+    return {
+      id: String(config.id),
+      hero_title: config.philosophyTitle || '',
+      hero_subtitle: null,
+      hero_image_url: null,
+      stats_25_years_title: null,
+      stats_25_years_value: String(config.yearsExperience || 25),
+      stats_brands_title: null,
+      stats_brands_value: String(config.globalBrands || 50),
+      stats_customers_title: null,
+      stats_customers_value: String(config.servedCustomers || 10000),
+      philosophy_title: config.philosophyTitle || null,
+      philosophy_subtitle: null
+    };
+  } catch (error) {
+    console.error('Error fetching home settings:', error);
     return null;
   }
-
-  return data;
 }
 
 // 后端 API 返回的品牌数据
@@ -268,7 +285,7 @@ export interface ProductCategory {
   display_order: number | null;
 }
 
-export async function getPosts(limit: number = 10): Promise<Post[]> {
+export async function getPosts(_limit: number = 10): Promise<Post[]> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/news`);
     if (!res.ok) {
@@ -502,6 +519,7 @@ export interface SiteConfigFromAPI {
   id: number;
   logoUrl: string | null;
   accentColor: string | null;
+  theme: string | null;
 }
 
 export async function getSiteConfig(): Promise<SiteConfigFromAPI | null> {

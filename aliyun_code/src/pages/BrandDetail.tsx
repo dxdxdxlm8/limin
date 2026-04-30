@@ -5,12 +5,15 @@ import { Footer } from '@/components/generated/Footer';
 import { useParams, Link } from 'react-router-dom';
 import { ScrollAnimation } from '@/components/generated/ScrollAnimation';
 import { getBrandBySlug, getProductsByBrandName, type BrandInfo, type Product } from '@/lib/queries';
+import { useThemeContext } from '@/lib/themeContext';
 
 export default function BrandDetail() {
   const { id } = useParams<{ id: string }>();
   const [brand, setBrand] = useState<BrandInfo | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hoveredCardId, setHoveredCardId] = useState<string | number | null>(null);
+  const { isLight, colors: c } = useThemeContext();
 
   useEffect(() => {
     async function fetchData() {
@@ -31,9 +34,10 @@ export default function BrandDetail() {
       <>
         <PageMeta title="品牌详情 - LIMIN AUDIO" />
         <Header />
-        <main className="pt-20 min-h-screen bg-black flex items-center justify-center">
+        <main className="pt-20 min-h-screen flex items-center justify-center" style={{ backgroundColor: c.bg }}>
           <div className="text-center">
-            <p className="text-sm font-light text-gray-400 tracking-[0.2em]">加载中...</p>
+            <div className="w-8 h-8 rounded-full animate-spin mx-auto mb-6" style={{ border: `1px solid ${c.accent}4D`, borderTopColor: c.accent }} />
+            <p className="text-sm font-light tracking-[0.3em] uppercase" style={{ color: c.textMuted }}>Loading</p>
           </div>
         </main>
         <Footer />
@@ -46,12 +50,16 @@ export default function BrandDetail() {
       <>
         <PageMeta title="品牌未找到 - LIMIN AUDIO" description="抱歉，您访问的品牌不存在" />
         <Header />
-        <main className="pt-20 min-h-screen bg-black flex items-center justify-center">
+        <main className="pt-20 min-h-screen flex items-center justify-center" style={{ backgroundColor: c.bg }}>
           <div className="text-center">
             <ScrollAnimation>
-              <h1 className="text-3xl font-extralight text-white mb-4 tracking-[0.15em]">品牌未找到</h1>
-              <p className="text-sm font-light text-gray-400 mb-8">抱歉，您访问的品牌不存在或已下架</p>
-              <Link to="/brands" className="inline-block px-8 py-3 bg-white hover:bg-gray-100 text-[#1A1A1A] text-xs font-light tracking-[0.2em] uppercase transition-all duration-500">
+              <h1 className="text-3xl font-extralight mb-4 tracking-[0.15em]" style={{ color: c.text }}>品牌未找到</h1>
+              <p className="text-sm font-light mb-8" style={{ color: c.textMuted }}>抱歉，您访问的品牌不存在或已下架</p>
+              <Link to="/brands" className="inline-block px-10 py-3 text-[10px] font-normal tracking-[0.3em] uppercase transition-all duration-700"
+                style={{ border: `1px solid ${isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'}`, color: c.text }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = `${c.accent}4D`; e.currentTarget.style.color = c.accent; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = c.text; }}
+              >
                 返回品牌中心
               </Link>
             </ScrollAnimation>
@@ -71,101 +79,108 @@ export default function BrandDetail() {
       />
       <Header />
       <main className="pt-20">
-        {/* Hero Section - 品牌大图 */}
-        <section className="relative bg-black">
-          <div className="max-w-[1400px] mx-auto px-8 pt-16 pb-8">
-            <ScrollAnimation>
-              <div className="text-center mb-12">
-                <p className="text-xs font-light tracking-[0.3em] uppercase text-gray-500 mb-6">
-                  {brand.country}
-                </p>
-                <h1 className="text-5xl md:text-7xl font-extralight text-white tracking-[0.15em]">
-                  {brand.name}
-                </h1>
-              </div>
-            </ScrollAnimation>
-          </div>
-          
-          {/* 品牌主图 - 全宽大图 */}
-          <ScrollAnimation>
-            <div className="max-w-[1200px] mx-auto px-8">
-              <div className="relative aspect-[21/9] overflow-hidden">
-                {brand.image_url ? (
-                  <img 
-                    src={brand.image_url} 
-                    alt={brand.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-                    <span className="text-2xl font-extralight text-zinc-700 tracking-[0.2em]">{brand.name}</span>
-                  </div>
-                )}
-                {/* 底部渐变遮罩 */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent" />
-              </div>
+        <section className="relative overflow-hidden" style={{ backgroundColor: c.bg }}>
+          <div className="max-w-[1400px] mx-auto px-8 pt-16 pb-24">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <ScrollAnimation>
+                <div className="aspect-[4/3] overflow-hidden" style={{ backgroundColor: c.bgAlt }}>
+                  {brand.image_url ? (
+                    <img src={brand.image_url} alt={brand.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <p className="text-sm font-light tracking-[0.2em]" style={{ color: c.textSub }}>{brand.name}</p>
+                    </div>
+                  )}
+                </div>
+              </ScrollAnimation>
+
+              <ScrollAnimation delay={200}>
+                <div>
+                  <p className="text-sm font-medium tracking-[0.3em] uppercase mb-6" style={{ color: c.accent }}>
+                    {brand.country}
+                  </p>
+                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-extralight tracking-[0.05em] mb-8" style={{ color: c.text }}>
+                    {brand.name}
+                  </h1>
+                  <div className="w-16 h-px mb-8" style={{ background: `linear-gradient(to right, ${c.accent}66, transparent)` }} />
+                  <p className="font-light max-w-lg tracking-[0.05em] text-base leading-relaxed" style={{ color: c.textSub }}>
+                    {brand.description}
+                  </p>
+                </div>
+              </ScrollAnimation>
             </div>
-          </ScrollAnimation>
+          </div>
         </section>
 
-        {/* 品牌介绍 */}
-        <section className="py-24 bg-black">
+        <section className="py-20" style={{ backgroundColor: c.bg }}>
           <div className="max-w-[800px] mx-auto px-8">
             <ScrollAnimation>
-              <div className="flex items-center justify-center gap-8 mb-16">
-                <div className="h-px w-24 bg-white/20" />
-                <p className="text-xs font-light tracking-[0.3em] uppercase text-gray-500">品牌介绍</p>
-                <div className="h-px w-24 bg-white/20" />
+              <div className="flex items-center gap-6 mb-12">
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${c.border})` }} />
+                <p className="text-[10px] font-normal tracking-[0.4em] uppercase" style={{ color: `${c.accent}99` }}>Brand Story</p>
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${c.border})` }} />
               </div>
             </ScrollAnimation>
-            
+
             <ScrollAnimation delay={100}>
               <div
-                className="prose prose-invert prose-lg max-w-none font-light leading-relaxed text-gray-300"
+                className={`prose prose-lg max-w-none font-light leading-[1.9] tracking-[0.02em] ${isLight ? '' : 'prose-invert'}`}
+                style={{ color: c.textSub }}
                 dangerouslySetInnerHTML={{ __html: brand.long_description || '' }}
               />
             </ScrollAnimation>
           </div>
         </section>
 
-        {/* 代表产品 */}
-        <section className="py-24 bg-[#0A0A0A]">
-          <div className="max-w-[1920px] mx-auto px-8">
+        <section className="py-20" style={{ backgroundColor: c.bgAlt }}>
+          <div className="max-w-[1400px] mx-auto px-8">
             <ScrollAnimation>
-              <div className="flex items-center justify-center gap-8 mb-16">
-                <div className="h-px w-24 bg-white/20" />
-                <p className="text-xs font-light tracking-[0.3em] uppercase text-gray-500">代表产品</p>
-                <div className="h-px w-24 bg-white/20" />
+              <div className="flex items-center gap-6 mb-12">
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${c.border})` }} />
+                <p className="text-xs font-medium tracking-[0.4em] uppercase" style={{ color: c.accent }}>代表产品</p>
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${c.border})` }} />
               </div>
             </ScrollAnimation>
 
             {products.length === 0 ? (
               <ScrollAnimation>
                 <div className="text-center py-12">
-                  <p className="text-sm font-light text-gray-500 tracking-[0.2em]">该品牌暂无产品</p>
+                  <p className="text-sm font-light tracking-[0.2em]" style={{ color: c.textSub }}>该品牌暂无产品</p>
                 </div>
               </ScrollAnimation>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {products.map((product, index) => (
                   <ScrollAnimation key={product.id} delay={index * 100}>
                     <Link
                       to={`/product/${product.slug || product.id}`}
                       className="group block"
+                      onMouseOver={() => setHoveredCardId(product.id)}
+                      onMouseOut={() => setHoveredCardId(null)}
                     >
-                      <div className="aspect-[4/3] overflow-hidden bg-zinc-900 mb-6">
+                      <div className="relative aspect-[16/10] overflow-hidden mb-6" style={{ backgroundColor: c.bg }}>
                         <img
-                          src={product.featured_image_url || 'https://baas-api.wanwang.xin/toc/image/preview/product-default.jpg?w=600&h=400&q=90'}
+                          src={product.featured_image_url || '/placeholder.svg'}
                           alt={product.title}
-                          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                          className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                         />
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                          style={{ background: `linear-gradient(to top, ${c.bg}CC, transparent, transparent)` }} />
+                        <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                          <p className="text-xs font-light tracking-[0.05em] line-clamp-2" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                            {product.summary}
+                          </p>
+                        </div>
                       </div>
-                      <h3 className="text-sm font-light text-white tracking-[0.1em] mb-2 group-hover:text-gray-300 transition-colors">
-                        {product.title}
-                      </h3>
-                      <p className="text-xs font-light text-gray-500 tracking-[0.1em] line-clamp-2">
-                        {product.summary}
-                      </p>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-normal tracking-[0.08em] transition-colors duration-500"
+                          style={{ color: hoveredCardId === product.id ? c.accent : c.text }}>
+                          {product.title}
+                        </h3>
+                        <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: c.accent }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </Link>
                   </ScrollAnimation>
                 ))}
@@ -174,26 +189,24 @@ export default function BrandDetail() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-32 bg-black relative overflow-hidden">
-          {/* 背景装饰 */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-white" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-white" />
-          </div>
-          
+        <section className="py-20 relative overflow-hidden" style={{ backgroundColor: c.bg }}>
           <div className="max-w-[800px] mx-auto px-8 text-center relative z-10">
             <ScrollAnimation>
-              <p className="text-xs font-light tracking-[0.3em] uppercase text-gray-500 mb-6">联系我们</p>
-              <h2 className="text-3xl md:text-5xl font-extralight text-white mb-8 tracking-[0.1em]">
+              <p className="text-xs font-medium tracking-[0.4em] uppercase mb-6" style={{ color: c.accent }}>
+                Contact
+              </p>
+              <h2 className="text-4xl md:text-5xl font-extralight mb-6 tracking-[0.05em]" style={{ color: c.text }}>
                 对 {brand.name} 感兴趣？
               </h2>
-              <p className="text-sm font-light text-gray-400 mb-12 tracking-[0.05em]">
+              <p className="font-light max-w-lg mx-auto mb-10 tracking-[0.05em] leading-relaxed" style={{ color: c.textMuted }}>
                 我们的专家团队将为您提供详细的品牌介绍和产品推荐
               </p>
               <Link
                 to="/contact"
-                className="inline-block px-12 py-4 border border-white/30 text-white text-xs font-light tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500"
+                className="inline-block px-10 py-3.5 text-xs font-medium tracking-[0.3em] uppercase transition-all duration-500"
+                style={{ border: `1px solid ${c.borderAccent}`, color: c.accent }}
+                onMouseOver={e => { e.currentTarget.style.backgroundColor = c.accent; e.currentTarget.style.color = c.ctaText; }}
+                onMouseOut={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = c.accent; }}
               >
                 咨询该品牌
               </Link>

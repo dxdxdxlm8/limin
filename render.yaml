@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: limin-website
+    runtime: node
+    plan: free
+    buildCommand: |
+      # Build frontend
+      cd aliyun_code && pnpm install && pnpm build
+      # Build backend
+      cd ../backend && pnpm install && npx prisma generate
+    startCommand: cd backend && pnpm start
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/backend/prisma
+      sizeGB: 1

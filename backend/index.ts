@@ -479,6 +479,18 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
+// Serve frontend static files (for production deployment)
+const frontendDistPath = path.join(__dirname, '../../aliyun_code/dist');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+      res.sendFile(path.join(frontendDistPath, 'index.html'));
+    }
+  });
+  console.log('Frontend static files served from:', frontendDistPath);
+}
+
 app.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });

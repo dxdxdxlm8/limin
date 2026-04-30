@@ -69,8 +69,8 @@ export function Header() {
       }}
     >
       <div className="max-w-[1920px] mx-auto px-8">
-        <div className="flex items-center justify-between py-4">
-          <Link to="/" className="flex items-center gap-4 group">
+        <div className="flex items-center py-4">
+          <Link to="/" className="flex items-center gap-4 group mr-16">
             {siteConfig?.logoUrl ? (
               <img
                 src={siteConfig.logoUrl}

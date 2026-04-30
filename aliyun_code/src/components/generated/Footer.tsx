@@ -112,34 +112,34 @@ export function Footer() {
             <ul className={`space-y-4 text-base font-light tracking-[0.05em] ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
               {contact?.phone && (
                 <li className="flex items-start gap-3">
-                  <span className="text-xs mt-1" style={{ color: `${accentColor}66` }}>T</span>
+                  <span className="text-sm mt-1 font-medium" style={{ color: accentColor }}>T</span>
                   <span>{contact.phone}</span>
                 </li>
               )}
               {contact?.email && (
                 <li className="flex items-start gap-3">
-                  <span className="text-xs mt-1" style={{ color: `${accentColor}66` }}>E</span>
+                  <span className="text-sm mt-1 font-medium" style={{ color: accentColor }}>E</span>
                   <span>{contact.email}</span>
                 </li>
               )}
               {contact?.address && (
                 <li className="flex items-start gap-3">
-                  <span className="text-xs mt-1" style={{ color: `${accentColor}66` }}>A</span>
+                  <span className="text-sm mt-1 font-medium" style={{ color: accentColor }}>A</span>
                   <span className="leading-relaxed">{contact.address}</span>
                 </li>
               )}
               {!contact && (
                 <>
                   <li className="flex items-start gap-3">
-                    <span className="text-xs mt-1" style={{ color: `${accentColor}66` }}>T</span>
+                    <span className="text-sm mt-1 font-medium" style={{ color: accentColor }}>T</span>
                     <span>+86 400-888-8888</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-xs mt-1" style={{ color: `${accentColor}66` }}>E</span>
+                    <span className="text-sm mt-1 font-medium" style={{ color: accentColor }}>E</span>
                     <span>info@liminaudio.com</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-xs mt-1" style={{ color: `${accentColor}66` }}>A</span>
+                    <span className="text-sm mt-1 font-medium" style={{ color: accentColor }}>A</span>
                     <span className="leading-relaxed">上海市黄浦区淮海中路 888 号</span>
                   </li>
                 </>

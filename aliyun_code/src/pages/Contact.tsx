@@ -31,7 +31,7 @@ function ContactCard({ icon: Icon, label, children, c }: {
       >
         <Icon size={18} className="transition-colors duration-700" style={{ color: hovered ? c.accent : c.textSub }} />
       </div>
-      <h3 className="text-[10px] font-normal tracking-[0.4em] uppercase mb-4" style={{ color: c.textSub }}>
+      <h3 className="text-xs font-normal tracking-[0.4em] uppercase mb-4" style={{ color: c.accent }}>
         {label}
       </h3>
       {children}
@@ -162,7 +162,7 @@ export default function Contact() {
 
               <ScrollAnimation delay={200}>
                 <ContactCard icon={FaMapMarkerAlt} label="地址" c={c}>
-                  <p className="text-sm font-light leading-relaxed" style={{ color: c.textMuted }}>
+                  <p className="text-lg font-extralight tracking-[0.05em] leading-relaxed" style={{ color: c.text }}>
                     {contactInfo?.address || '上海市黄浦区南苏州路 933 号 103 室'}
                   </p>
                 </ContactCard>

@@ -498,12 +498,15 @@ for (const p of possiblePaths) {
 if (frontendDistPath) {
   console.log('Frontend static files served from:', frontendDistPath);
   app.use(express.static(frontendDistPath));
-  
+
   // SPA fallback - 所有非 API 路由都返回 index.html
-  app.get('*', (req, res, next) => {
+  // 使用正则表达式匹配所有路径 (Express 5.x 不支持 '*' 通配符)
+  app.use((req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
       return next();
     }
+    // 如果是文件请求且存在，则已由 express.static 处理
+    // 否则返回 index.html 让前端路由处理
     res.sendFile(path.join(frontendDistPath, 'index.html'));
   });
 } else {

@@ -84,7 +84,7 @@ export function Header() {
             )}
           </Link>
 
-          <nav ref={navRef} className="hidden lg:flex items-center gap-12 relative ml-56">
+          <nav ref={navRef} className="hidden lg:flex items-center gap-12 relative ml-44">
             <Link
               to="/"
               onMouseEnter={() => setHoveredIndex(0)}

@@ -6,7 +6,7 @@ import path from "path";
 import {
   WXZ_WEB_BUILDER_VITE_PLUGINS,
   WXZ_WEB_BUILDER_VITE_SERVER,
-} from "wxz-web-builder-vite-plugin";
+} from "./vite-plugins/wxz-web-builder-plugin";
 
 // https://vite.dev/config/
 export default defineConfig({

@@ -40,7 +40,7 @@ export function Footer() {
                 LIMIN <span className="font-light">AUDIO</span>
               </div>
             )}
-            <p className={`text-sm font-light leading-[1.8] tracking-[0.05em] max-w-sm ${isLight ? 'text-gray-500' : 'text-gray-600'}`}>
+            <p className={`text-base font-light leading-[1.8] tracking-[0.05em] max-w-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
               25 年专注高端音频，连接全球顶级音响品牌与中国发烧友。我们致力于为您呈现最纯粹的声音体验。
             </p>
 
@@ -81,7 +81,7 @@ export function Footer() {
           </div>
 
           <div className="md:col-span-2">
-            <h4 className="text-[10px] font-normal tracking-[0.3em] uppercase mb-8" style={{ color: `${accentColor}99` }}>
+            <h4 className="text-xs font-normal tracking-[0.3em] uppercase mb-8" style={{ color: accentColor }}>
               导航
             </h4>
             <ul className="space-y-4">
@@ -94,7 +94,7 @@ export function Footer() {
                 <li key={item.path}>
                   <Link
                     to={item.path}
-                    className={`text-sm font-light transition-colors duration-500 tracking-[0.05em] ${isLight ? 'text-gray-500' : 'text-gray-600'}`}
+                    className={`text-base font-light transition-colors duration-500 tracking-[0.05em] ${isLight ? 'text-gray-600' : 'text-gray-300'}`}
                     onMouseOver={e => e.currentTarget.style.color = accentColor}
                     onMouseOut={e => e.currentTarget.style.color = ''}
                   >
@@ -106,10 +106,10 @@ export function Footer() {
           </div>
 
           <div className="md:col-span-3">
-            <h4 className="text-[10px] font-normal tracking-[0.3em] uppercase mb-8" style={{ color: `${accentColor}99` }}>
+            <h4 className="text-xs font-normal tracking-[0.3em] uppercase mb-8" style={{ color: accentColor }}>
               联系方式
             </h4>
-            <ul className={`space-y-4 text-sm font-light tracking-[0.05em] ${isLight ? 'text-gray-500' : 'text-gray-600'}`}>
+            <ul className={`space-y-4 text-base font-light tracking-[0.05em] ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
               {contact?.phone && (
                 <li className="flex items-start gap-3">
                   <span className="text-xs mt-1" style={{ color: `${accentColor}66` }}>T</span>
@@ -152,10 +152,10 @@ export function Footer() {
           className="mt-20 pt-8 flex flex-col md:flex-row items-center justify-between gap-4"
           style={{ borderTop: `1px solid ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)'}` }}
         >
-          <p className={`text-[11px] font-light tracking-[0.1em] ${isLight ? 'text-gray-400' : 'text-gray-700'}`}>
+          <p className={`text-xs font-light tracking-[0.1em] ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
             &copy; 2026 LIMIN AUDIO. All rights reserved.
           </p>
-          <p className={`text-[11px] font-light tracking-[0.1em] ${isLight ? 'text-gray-400' : 'text-gray-700'}`}>
+          <p className={`text-xs font-light tracking-[0.1em] ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
             沪 ICP 备 12345678 号
           </p>
         </div>
